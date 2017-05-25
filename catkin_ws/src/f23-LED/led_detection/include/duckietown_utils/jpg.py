@@ -12,7 +12,7 @@ def image_cv_from_jpg(data):
     if major=='2':
         image_cv = cv2.imdecode(s, cv2.CV_LOAD_IMAGE_COLOR)
     else:
-  	    image_cv = cv2.imdecode(s, cv2.IMREAD_COLOR)
+        image_cv = cv2.imdecode(s, cv2.IMREAD_COLOR)
 
     if image_cv is None:
         msg = 'Could not decode image (cv2.imdecode returned None). '

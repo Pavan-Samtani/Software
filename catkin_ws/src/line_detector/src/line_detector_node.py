@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 from anti_instagram.AntiInstagram import *
 from cv_bridge import CvBridge, CvBridgeError
-from duckietown_msgs.msg import (AntiInstagramTransform, BoolStamped, Segment,
-    SegmentList, Vector2D)
+from duckietown_msgs.msg import (AntiInstagramTransform, BoolStamped, Segment, SegmentList, Vector2D)
 from duckietown_utils.instantiate_utils import instantiate
 from duckietown_utils.jpg import image_cv_from_jpg
 from geometry_msgs.msg import Point
