@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-#fx336.58763787613367
-#fy342.678617163186
+#fx168.86429674181502
+#fy170.69143299098607
 #hx3.7
 #hy3.2
 
@@ -96,23 +96,22 @@ class Detector():
             #Filtrar por area minima
             if w*h > self.min_area:
 
-                #Dibujar un rectangulo en la imagen
+                
                 if w*h>w0*h0:
                     x0=x;y0=y;w0=w;h0=h
-        cv2.rectangle(frame, (x0,y0), (x0+w0,y0+h0), (0,0,0), 2)
-        z=(336.58763787613367*3.7)/w0
-        #z=(342.678617163186*3.2)/h0
-        Punto=Point(x0+w0/2,y0+h0/2,z)
+                    cv2.rectangle(frame, (x0,y0), (x0+w0,y0+h0), (0,0,0), 2)
+                    #z=(168.86429674181502*3.7)/w0
+                    z=(170.69143299098607*3.2)/h0
+                    Punto=Point(x0+w0/2,y0+h0/2,z)
 
-        #Punto medio
-        
+                    #Punto medio
+                       
+
+                    #Publicar Point center de mayor tamanio
+                    self.pub_punto.publish(Punto)
         msg1 =self.bridge.cv2_to_imgmsg(frame, "bgr8")
         #Publicar frame
         self.publicar.publish(msg1)
-       
-
-        #Publicar Point center de mayor tamanio
-        self.pub_punto.publish(Punto)
 
 def main():
 
