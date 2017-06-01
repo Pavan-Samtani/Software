@@ -29,7 +29,7 @@ class Controller():
     def process_joy(self,point):
         self.punto=point
         
-    def command(self,msg):
+    def comando(self,msg):
         msg_t=Twist2DStamped()
         x=float(self.punto.x)
         y=self.punto.y
@@ -46,10 +46,14 @@ class Controller():
         self.pub_wheels.publish(msg)
 
 
-def main():
-    rospy.init_node('Controller')
-    Controller()
-    rospy.spin()
-if __name__ == '__main__':
-    main()
+    def main():
+
+        rospy.init_node('Controller')
+
+        Controller()
+
+        rospy.spin()
+
+    if __name__ == '__main__':
+        main()
 
