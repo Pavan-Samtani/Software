@@ -16,7 +16,7 @@ from sensor_msgs.msg import Joy
 
 import numpy as np
 
-class Controller():
+class controller():
 
     def __init__(self):
         self.sub_punto = rospy.Subscriber('Puntos',Point, self.process_joy)
@@ -31,24 +31,25 @@ class Controller():
         
     def command(self,msg):
         msg_t=Twist2DStamped()
-        x=float(self.punto.x)
-        y=self.punto.y
-        z=self.punto.z
-        if float(z)<=15:
-            if x>=160 and x<=230:
-                msg_t.omega=1
-                msg_t.v=msg.v
-                self.pub_wheels.publish(msg_t)
-            if x>=90 and x<160:
-                msg_t.omega=-1
-                msg_t.v=msg.v
-                self.pub_wheels.publish(msg_t)
-        self.pub_wheels.publish(msg)
+        if self.punto!=None:
+            x=float(self.punto.x)
+            y=self.punto.y
+            z=self.punto.z
+            if float(z)<=15:
+                if x>=160 and x<=230:
+                    msg_t.omega=1
+                    msg_t.v=msg.v
+                    self.pub_wheels.publish(msg_t)
+                if x>=90 and x<160:
+                    msg_t.omega=-1
+                    msg_t.v=msg.v
+                    self.pub_wheels.publish(msg_t)
+            self.pub_wheels.publish(msg)
 
 
 def main():
-    rospy.init_node('Controller')
-    Controller()
+    rospy.init_node('controller')
+    controller()
     rospy.spin()
 if __name__ == '__main__':
     main()

@@ -17,7 +17,16 @@
  		<arg name="live" value="$(arg live)"/>
 		<arg name="rect" value="true" />
  	</include>
- 
+
+    <node ns="$(arg veh)" pkg="ros_cap" type="duck_detector.py" name="duck_detector">
+    </node>
+    
+    <node ns="$(arg veh)" pkg="ros_cap" type="joy_control.py" name="joy_control">
+    </node>
+
+    <node ns="$(arg veh)" pkg="ros_cap" type="controller.py" name="controller">
+    </node>
+
  	<!-- AprilTags Detections -->
     <remap from="image_rect" to="camera_node/image/rect" />
     <remap from="camera_node/image/camera_info" to="camera_node/raw_camera_info" />

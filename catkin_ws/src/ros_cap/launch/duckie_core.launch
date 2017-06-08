@@ -36,15 +36,15 @@
         <arg name="veh" value="$(arg veh)"/>
     </include>
 
-	<!-- Camera -->
-  <include file="$(find duckietown)/launch/camera.launch">
+	<!-- Camera 
+    <include file="$(find duckietown)/launch/camera.launch">
     <arg name="veh" value="$(arg veh)"/>
     <arg name="local" value="$(arg local)"/>
     <arg name="config" value="$(arg config)"/>
     <arg name="param_file_name" value="$(arg param_file_name)"/>
     <arg name="raw" value="$(arg raw)"/>
 	<arg name="rect" value="$(arg rect)"/>
-    <arg name="cam_info" value="$(arg cam_info)"/> <!-- this should possible change later when we take logs without camera info but let's leave for now -->
-    <arg name="live" value="$(arg live)"/>
-  </include>
+    <arg name="cam_info" value="$(arg cam_info)"/>--> <!-- this should possible change later when we take logs without camera info but let's leave for now -->
+    <!--<arg name="live" value="$(arg live)"/>
+  </include>-->
 </launch>
