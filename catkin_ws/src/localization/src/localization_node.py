@@ -29,11 +29,7 @@ class LocalizationNode(object):
         self.duckiebot_lifetime = self.setupParam("~duckiebot_lifetime", 5) # The number of seconds to keep the duckiebot alive bewtween detections
         self.highlight_lifetime = self.setupParam("~highlight_lifetime", 3) # The number of seconds to keep a sign highlighted after a detection
 	self.lista=list()
-	self.T=None
-        self.T.transform = None
-        self.T.header.frame_id = None
-	self.T.header.stamp = None
-        self.T.child_frame_id = None
+	self.Tn=None
 
         # Setup the publishers and subscribers
         self.sub_april = rospy.Subscriber("~apriltags", AprilTagsWithInfos, self.tag_callback)
@@ -50,37 +46,46 @@ class LocalizationNode(object):
         self.publish_duckie_marker()
 
         rospy.loginfo("[%s] has started", self.node_name)
-    
+
     def delta(self,msg):
-    	self.lista.append([msg.v,msg.omega,time.time()])
-	
-	
+	i=len(self.lista)
+	if i>50:
+		L=list()
+		L.append(self.lista[i-1])
+		self.lista=L[:]
+    	self.lista.append([msg.v,msg.omega,rospy.get_time()])
+
+
+
     def pos_callback(self,msg):
         self.delta(msg)
-        if len(self.lista)==1 or self.lista==list():
+        if len(self.lista)==1:
     		return
     	else:
     		i=len(self.lista)
-    		deltaT=self.lista[i-1][2]-self.lista[i-1][2]
+    		deltaT=self.lista[i-1][2]-self.lista[i-2][2]
     		Omega=self.lista[i-2][1]
     		v=self.lista[i-2][0]
+		#rospy.loginfo(type(deltaT))
     		l=[float(deltaT)*float(v)*float(0.52),float(deltaT)*float(Omega)*float(0.52)]
 		a=math.cos(l[1])
 		b=math.sin(l[1])
-		M=self.transform_to_matrix(self.T)
+		M=self.transform_to_matrix(self.Tn)
 		Mov=np.matrix([[a,-b,0,l[0]],[b,a,0,0],[0, 0,1,0],[0,0,0,1]])
 		Mr_w=np.dot(M,Mov)
 		P=self.matrix_to_transform(Mr_w)
-		self.T= TransformStamped()
-		self.T.transform = P
-		self.T.header.frame_id = self.world_frame
-		self.T.header.stamp = rospy.Time.now()
-		self.T.child_frame_id = self.duckiebot_frame
-		self.pub_tf.publish(TFMessage([self.T]))
+		self.Tn=P
+		T= TransformStamped()
+		T.transform = P
+		T.header.frame_id = self.world_frame
+		T.header.stamp = rospy.Time.now()
+		T.child_frame_id = self.duckiebot_frame
+		self.pub_tf.publish(TFMessage([T]))
 		self.lifetimer = rospy.Time.now()
-		
-    
-    
+		#rospy.loginfo("l0: %f, l1: %f, cos: %f, sin: %f, t: %f",l[0],l[1],a,b,deltaT)
+
+
+
     def tag_callback(self, msg_tag):
         # Listen for the transform of the tag in the world
         avg = PoseAverage.PoseAverage()
@@ -109,12 +114,13 @@ class LocalizationNode(object):
             rot = Tr_w.rotation
             rotz=tr.euler_from_quaternion((rot.x, rot.y, rot.z, rot.w))[2]
             (rot.x, rot.y, rot.z, rot.w) = tr.quaternion_from_euler(0, 0, rotz)
-            self.T = TransformStamped()
-            self.T.transform = Tr_w
-            self.T.header.frame_id = self.world_frame
-            self.T.header.stamp = rospy.Time.now()
-            self.T.child_frame_id = self.duckiebot_frame
-            self.pub_tf.publish(TFMessage([self.T]))
+            T = TransformStamped()
+	    self.Tn=Tr_w
+            T.transform = Tr_w
+            T.header.frame_id = self.world_frame
+            T.header.stamp = rospy.Time.now()
+            T.child_frame_id = self.duckiebot_frame
+            self.pub_tf.publish(TFMessage([T]))
             self.lifetimer = rospy.Time.now()
 
     def publish_duckie_marker(self):
