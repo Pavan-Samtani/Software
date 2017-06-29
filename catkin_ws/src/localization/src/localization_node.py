@@ -61,13 +61,13 @@ class LocalizationNode(object):
         self.delta(msg)
         if len(self.lista)==1:
     		return
-    	else:
+    	elif len(self.lista)>1 and self.Tn!=None:
     		i=len(self.lista)
     		deltaT=self.lista[i-1][2]-self.lista[i-2][2]
     		Omega=self.lista[i-2][1]
     		v=self.lista[i-2][0]
 		#rospy.loginfo(type(deltaT))
-    		l=[float(deltaT)*float(v)*float(0.52),float(deltaT)*float(Omega)*float(0.52)]
+    		l=[float(deltaT)*float(v)*float(0.53),float(deltaT)*float(Omega)*float(0.43)]
 		a=math.cos(l[1])
 		b=math.sin(l[1])
 		M=self.transform_to_matrix(self.Tn)

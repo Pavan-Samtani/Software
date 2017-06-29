@@ -399,8 +399,8 @@ Visualization Manager:
           Value: false
         tile_4_5:
           Value: false
-        viewed_tag_201:
-          Value: false
+        viewed_tag_204:
+          Value: true
         world:
           Value: false
       Marker Scale: 1

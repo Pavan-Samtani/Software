@@ -16,10 +16,12 @@ class joy_control():
          msg_t = Twist2DStamped()
          if abs(float(msg.axes[1]))<0.3: #Precisar el avance
             msg_t.v=0
-         if abs(float(msg.axes[0]))<0.5:
+         else:
+            msg_t.v=msg.axes[1]
+         if abs(float(msg.axes[0]))<0.3:
             msg_t.omega=0
-         msg_t.omega=msg.axes[0]*10
-         msg_t.v=msg.axes[1]
+         else:
+            msg_t.omega=msg.axes[0]*10
          self.pub_wheels.publish(msg_t)
 
 def main():
