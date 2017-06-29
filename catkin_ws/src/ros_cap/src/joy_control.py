@@ -18,7 +18,7 @@ class joy_control():
             msg_t.v=0
          else:
             msg_t.v=msg.axes[1]
-         if abs(float(msg.axes[0]))<0.3:
+         if abs(float(msg.axes[0]))<0.6:
             msg_t.omega=0
          else:
             msg_t.omega=msg.axes[0]*10

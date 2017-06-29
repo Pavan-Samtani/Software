@@ -67,7 +67,7 @@ class LocalizationNode(object):
     		Omega=self.lista[i-2][1]
     		v=self.lista[i-2][0]
 		#rospy.loginfo(type(deltaT))
-    		l=[float(deltaT)*float(v)*float(0.53),float(deltaT)*float(Omega)*float(0.43)]
+    		l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]
 		a=math.cos(l[1])
 		b=math.sin(l[1])
 		M=self.transform_to_matrix(self.Tn)
