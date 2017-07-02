@@ -28,12 +28,12 @@ class LocalizationNode(object):
         self.duckiebot_frame = "duckiebot"
         self.duckiebot_lifetime = self.setupParam("~duckiebot_lifetime", 5) # The number of seconds to keep the duckiebot alive bewtween detections
         self.highlight_lifetime = self.setupParam("~highlight_lifetime", 3) # The number of seconds to keep a sign highlighted after a detection
-	self.lista=list()
-	self.Tn=None
+		self.lista=list()
+		self.Tn=None
 
         # Setup the publishers and subscribers
         self.sub_april = rospy.Subscriber("~apriltags", AprilTagsWithInfos, self.tag_callback)
-	self.sub_wheels=rospy.Subscriber('/duckiebot/wheels_driver_node/car_cmd', Twist2DStamped, self.pos_callback)
+		self.sub_wheels=rospy.Subscriber('/duckiebot/wheels_driver_node/car_cmd', Twist2DStamped, self.pos_callback)
         self.pub_tf = rospy.Publisher("/tf", TFMessage, queue_size=1, latch=True)
         self.pub_rviz = rospy.Publisher("/sign_highlights", Marker, queue_size=1, latch=True)
 
@@ -46,43 +46,57 @@ class LocalizationNode(object):
         self.publish_duckie_marker()
 
         rospy.loginfo("[%s] has started", self.node_name)
-
-    def delta(self,msg):
-	i=len(self.lista)
-	if i>50:
-		L=list()
-		L.append(self.lista[i-1])
-		self.lista=L[:]
+	
+	#delta: msg(Twist2DStamped) -> None
+	#Guarda una lista con la velocidad lineal, angular y el tiempo actual en el objeto self.lista
+	def delta(self,msg):
+		i=len(self.lista)
+		if i>50: #Si el objeto self.lista tiene mas de 50 elementos, lo reducimos al ultimo elemento (los anteriores no sirven)
+			L=list()
+			L.append(self.lista[i-1])
+			self.lista=L[:]
+		#Guardamos las velocidades y tiempo actual en el objeto self.lista
     	self.lista.append([msg.v,msg.omega,rospy.get_time()])
 
 
-
+	#pos_callback: msg(Twist2DStamped) -> None
+	#Calcula el cambio de posicion que hubo entre la posición en la que estaba el robot entre el comando (del joystick) anterior y actual
+	#luego, publica esa posicion el mapa.
     def pos_callback(self,msg):
-        self.delta(msg)
+		#Guardamos las velocidades y tiempo actual en el objeto self.lista
+		self.delta(msg)
+		#si es el primer comando que se recibe del joystick, no hay comando anterior por lo que se termina la función
         if len(self.lista)==1:
     		return
+		#si no es el primer comando que se recibe del joystick y ya se tiene una posición inicial
     	elif len(self.lista)>1 and self.Tn!=None:
     		i=len(self.lista)
     		deltaT=self.lista[i-1][2]-self.lista[i-2][2]
     		Omega=self.lista[i-2][1]
     		v=self.lista[i-2][0]
-		#rospy.loginfo(type(deltaT))
-    		l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]
-		a=math.cos(l[1])
-		b=math.sin(l[1])
-		M=self.transform_to_matrix(self.Tn)
-		Mov=np.matrix([[a,-b,0,l[0]],[b,a,0,0],[0, 0,1,0],[0,0,0,1]])
-		Mr_w=np.dot(M,Mov)
-		P=self.matrix_to_transform(Mr_w)
-		self.Tn=P
-		T= TransformStamped()
-		T.transform = P
-		T.header.frame_id = self.world_frame
-		T.header.stamp = rospy.Time.now()
-		T.child_frame_id = self.duckiebot_frame
-		self.pub_tf.publish(TFMessage([T]))
-		self.lifetimer = rospy.Time.now()
-		#rospy.loginfo("l0: %f, l1: %f, cos: %f, sin: %f, t: %f",l[0],l[1],a,b,deltaT)
+			#se crea una lista con la desplazamiento lineal y angular 
+    		l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]			
+			a=math.cos(l[1])
+			b=math.sin(l[1])
+			#Se convierte la información de posición anterior a una matriz
+			M=self.transform_to_matrix(self.Tn)
+			#Se define una matriz que tiene la información del cambio de posición y orientación 
+			Mov=np.matrix([[a,-b,0,l[0]],[b,a,0,0],[0, 0,1,0],[0,0,0,1]])
+			#Se multiplica la matriz que tiene el desplazamiento a la de la última posición guardada
+			Mr_w=np.dot(M,Mov)
+			#Se guarda la matriz anterior en un formato útil
+			P=self.matrix_to_transform(Mr_w)
+			#Se guarda la nueva posición y orientación
+			self.Tn=P
+			T= TransformStamped()
+			T.transform = P
+			T.header.frame_id = self.world_frame
+			T.header.stamp = rospy.Time.now()
+			T.child_frame_id = self.duckiebot_frame
+			#Se publica la posición, orientación y otros detalles en el mapa
+			self.pub_tf.publish(TFMessage([T]))
+			self.lifetimer = rospy.Time.now()
+
 
 
 
@@ -115,7 +129,7 @@ class LocalizationNode(object):
             rotz=tr.euler_from_quaternion((rot.x, rot.y, rot.z, rot.w))[2]
             (rot.x, rot.y, rot.z, rot.w) = tr.quaternion_from_euler(0, 0, rotz)
             T = TransformStamped()
-	    self.Tn=Tr_w
+	    	self.Tn=Tr_w
             T.transform = Tr_w
             T.header.frame_id = self.world_frame
             T.header.stamp = rospy.Time.now()
