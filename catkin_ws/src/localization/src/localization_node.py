@@ -20,6 +20,7 @@ import math
 #          pose3d/geometry_msgs/PoseStamped - The estimated pose of the robot in the world frame in 3D coordinates
 
 class LocalizationNode(object):
+	
 	def __init__(self):
         self.node_name = 'localization_node'
 
