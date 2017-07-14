@@ -68,7 +68,7 @@ class LocalizationNode(object):
 		self.delta(msg)
 		#si es el primer comando que se recibe del joystick, no hay comando anterior por lo que se termina la función
         if len(self.lista)==1:
-    		return
+			return
 		#si no es el primer comando que se recibe del joystick y ya se tiene una posición inicial
     	elif len(self.lista)>1 and self.Tn!=None:
     		i=len(self.lista)
@@ -121,7 +121,7 @@ class LocalizationNode(object):
             except(tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as ex:
                 rospy.logwarn("Error looking up transform for tag_%s", tag.id)
                 rospy.logwarn(ex.message)
-
+        
         Tr_w =  avg.get_average() # Average of the opinions
 
         # Broadcast the robot transform
@@ -132,6 +132,7 @@ class LocalizationNode(object):
             rotz=tr.euler_from_quaternion((rot.x, rot.y, rot.z, rot.w))[2]
             (rot.x, rot.y, rot.z, rot.w) = tr.quaternion_from_euler(0, 0, rotz)
             T = TransformStamped()
+            #Guardamos la Transformada
 	    	self.Tn=Tr_w
             T.transform = Tr_w
             T.header.frame_id = self.world_frame
