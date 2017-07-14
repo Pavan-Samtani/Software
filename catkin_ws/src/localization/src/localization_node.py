@@ -20,8 +20,7 @@ import math
 #          pose3d/geometry_msgs/PoseStamped - The estimated pose of the robot in the world frame in 3D coordinates
 
 class LocalizationNode(object):
-	
-	def __init__(self):
+    def __init__(self):
         self.node_name = 'localization_node'
 
         # Constants
@@ -48,61 +47,61 @@ class LocalizationNode(object):
 
         rospy.loginfo("[%s] has started", self.node_name)
 	
-	#delta: msg(Twist2DStamped) -> None
-	#Guarda una lista con la velocidad lineal, angular y el tiempo actual en el objeto self.lista
-	def delta(self,msg):
-		i=len(self.lista)
-		if i>50: #Si el objeto self.lista tiene mas de 50 elementos, lo reducimos al ultimo elemento (los anteriores no sirven)
-			L=list()
-			L.append(self.lista[i-1])
-			self.lista=L[:]
-		#Guardamos las velocidades y tiempo actual en el objeto self.lista
+    #delta: msg(Twist2DStamped) -> None
+    #Guarda una lista con la velocidad lineal, angular y el tiempo actual en el objeto self.lista
+    def delta(self,msg):
+	i=len(self.lista)
+	if i>50: #Si el objeto self.lista tiene mas de 50 elementos, lo reducimos al ultimo elemento (los anteriores no sirven)
+	    L=list()
+	    L.append(self.lista[i-1])
+	    self.lista=L[:]
+	    #Guardamos las velocidades y tiempo actual en el objeto self.lista
     	self.lista.append([msg.v,msg.omega,rospy.get_time()])
 
 
-	#pos_callback: msg(Twist2DStamped) -> None
-	#Calcula el cambio de posicion que hubo entre la posición en la que estaba el robot entre el comando (del joystick) anterior y actual
-	#luego, publica esa posicion el mapa.
+    #pos_callback: msg(Twist2DStamped) -> None
+    #Calcula el cambio de posicion que hubo entre la posición en la que estaba el robot entre el comando (del joystick) anterior y actual
+    #luego, publica esa posicion el mapa.
     def pos_callback(self,msg):
-		#Guardamos las velocidades y tiempo actual en el objeto self.lista
-		self.delta(msg)
-		#si es el primer comando que se recibe del joystick, no hay comando anterior por lo que se termina la función
+	#Guardamos las velocidades y tiempo actual en el objeto self.lista
+	self.delta(msg)
+	#si es el primer comando que se recibe del joystick, no hay comando anterior por lo que se termina la función
         if len(self.lista)==1:
-			return
-		#si no es el primer comando que se recibe del joystick y ya se tiene una posición inicial
+	    return
+	#si no es el primer comando que se recibe del joystick y ya se tiene una posición inicial
     	elif len(self.lista)>1 and self.Tn!=None:
-    		i=len(self.lista)
-    		deltaT=self.lista[i-1][2]-self.lista[i-2][2]
-    		Omega=self.lista[i-2][1]
-    		v=self.lista[i-2][0]
-			#se crea una lista con la desplazamiento lineal y angular, notese que 0.56 es el k del que se habla en el reporte
-			#y 0.43 es el k'. (Factores que relacionan el desplazamiento lineal y angular, teórico con el real, respectivamente)
-    		l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]			
-			a=math.cos(l[1])
-			b=math.sin(l[1])
-			#Se convierte la información de posición anterior a una matriz
-			M=self.transform_to_matrix(self.Tn)
-			#Se define una matriz que tiene la información del cambio de posición y orientación 
-			Mov=np.matrix([[a,-b,0,l[0]],[b,a,0,0],[0, 0,1,0],[0,0,0,1]])
-			#Se multiplica la matriz que tiene el desplazamiento a la de la última posición guardada
-			Mr_w=np.dot(M,Mov)
-			#Se guarda la matriz anterior en un formato útil
-			P=self.matrix_to_transform(Mr_w)
-			#Se guarda la nueva posición y orientación
-			self.Tn=P
-			T= TransformStamped()
-			T.transform = P
-			T.header.frame_id = self.world_frame
-			T.header.stamp = rospy.Time.now()
-			T.child_frame_id = self.duckiebot_frame
-			#Se publica la posición, orientación y otros detalles en el mapa
-			self.pub_tf.publish(TFMessage([T]))
-			self.lifetimer = rospy.Time.now()
+	    i=len(self.lista)
+    	    deltaT=self.lista[i-1][2]-self.lista[i-2][2]
+    	    Omega=self.lista[i-2][1]
+    	    v=self.lista[i-2][0]
+	    #se crea una lista con la desplazamiento lineal y angular, notese que 0.56 es el k del que se habla en el reporte
+	    #y 0.43 es el k'. (Factores que relacionan el desplazamiento lineal y angular, teórico con el real, respectivamente)
+    	    l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]			
+	    a=math.cos(l[1])
+	    b=math.sin(l[1])
+	    #Se convierte la información de posición anterior a una matriz
+	    M=self.transform_to_matrix(self.Tn)
+	    #Se define una matriz que tiene la información del cambio de posición y orientación 
+	    Mov=np.matrix([[a,-b,0,l[0]],[b,a,0,0],[0, 0,1,0],[0,0,0,1]])
+	    #Se multiplica la matriz que tiene el desplazamiento a la de la última posición guardada
+	    Mr_w=np.dot(M,Mov)
+	    #Se guarda la matriz anterior en un formato útil
+	    P=self.matrix_to_transform(Mr_w)
+	    #Se guarda la nueva posición y orientación
+	    self.Tn=P
+	    T= TransformStamped()
+	    T.transform = P
+	    T.header.frame_id = self.world_frame
+	    T.header.stamp = rospy.Time.now()
+	    T.child_frame_id = self.duckiebot_frame
+	    #Se publica la posición, orientación y otros detalles en el mapa
+	    self.pub_tf.publish(TFMessage([T]))
+	    self.lifetimer = rospy.Time.now()
 
 
 
-	#tag_callback: msg_tag -> None
-	#Estima la posicion cuando ve un Apriltag.
+    #tag_callback: msg_tag -> None
+    #Estima la posicion cuando ve un Apriltag.
     def tag_callback(self, msg_tag):
         # Listen for the transform of the tag in the world
         avg = PoseAverage.PoseAverage()
@@ -133,27 +132,27 @@ class LocalizationNode(object):
             (rot.x, rot.y, rot.z, rot.w) = tr.quaternion_from_euler(0, 0, rotz)
             T = TransformStamped()
             #Guardamos la Transformada
-	    	self.Tn=Tr_w
+	    self.Tn=Tr_w
             T.transform = Tr_w
             T.header.frame_id = self.world_frame
             T.header.stamp = rospy.Time.now()
             T.child_frame_id = self.duckiebot_frame
             self.pub_tf.publish(TFMessage([T]))
             self.lifetimer = rospy.Time.now()
-
-	def publish_duckie_marker(self):
-        # Publish a duckiebot transform far away unless the timer was reset
+	
+    def publish_duckie_marker(self):
+    # Publish a duckiebot transform far away unless the timer was reset
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             rate.sleep()
             if rospy.Time.now() - self.lifetimer > rospy.Duration(self.duckiebot_lifetime):
-                T = TransformStamped()
-                T.transform.translation.z = 1000    # Throw it 1km in the air
-                T.transform.rotation.w = 1
-                T.header.frame_id = self.world_frame
-                T.header.stamp = rospy.Time.now()
-                T.child_frame_id = self.duckiebot_frame
-                self.pub_tf.publish(TFMessage([T]))
+            T = TransformStamped()
+            T.transform.translation.z = 1000    # Throw it 1km in the air
+            T.transform.rotation.w = 1
+            T.header.frame_id = self.world_frame
+            T.header.stamp = rospy.Time.now()
+            T.child_frame_id = self.duckiebot_frame
+            self.pub_tf.publish(TFMessage([T]))
 
     def publish_sign_highlight(self, id):
         # Publish a highlight marker on the sign that is seen by the robot
