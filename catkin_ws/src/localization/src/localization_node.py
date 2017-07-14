@@ -20,7 +20,7 @@ import math
 #          pose3d/geometry_msgs/PoseStamped - The estimated pose of the robot in the world frame in 3D coordinates
 
 class LocalizationNode(object):
-    def __init__(self):
+	def __init__(self):
         self.node_name = 'localization_node'
 
         # Constants
@@ -74,7 +74,8 @@ class LocalizationNode(object):
     		deltaT=self.lista[i-1][2]-self.lista[i-2][2]
     		Omega=self.lista[i-2][1]
     		v=self.lista[i-2][0]
-			#se crea una lista con la desplazamiento lineal y angular 
+			#se crea una lista con la desplazamiento lineal y angular, notese que 0.56 es el k del que se habla en el reporte
+			#y 0.43 es el k'. (Factores que relacionan el desplazamiento lineal y angular, teórico con el real, respectivamente)
     		l=[float(deltaT)*float(v)*float(0.56),float(deltaT)*float(Omega)*float(0.43)]			
 			a=math.cos(l[1])
 			b=math.sin(l[1])
@@ -99,7 +100,8 @@ class LocalizationNode(object):
 
 
 
-
+	#tag_callback: msg_tag -> None
+	#Estima la posicion cuando ve un Apriltag.
     def tag_callback(self, msg_tag):
         # Listen for the transform of the tag in the world
         avg = PoseAverage.PoseAverage()
@@ -137,7 +139,7 @@ class LocalizationNode(object):
             self.pub_tf.publish(TFMessage([T]))
             self.lifetimer = rospy.Time.now()
 
-    def publish_duckie_marker(self):
+	def publish_duckie_marker(self):
         # Publish a duckiebot transform far away unless the timer was reset
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
