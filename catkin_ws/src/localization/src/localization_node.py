@@ -29,12 +29,12 @@ class LocalizationNode(object):
         self.duckiebot_frame = "duckiebot"
         self.duckiebot_lifetime = self.setupParam("~duckiebot_lifetime", 5) # The number of seconds to keep the duckiebot alive bewtween detections
         self.highlight_lifetime = self.setupParam("~highlight_lifetime", 3) # The number of seconds to keep a sign highlighted after a detection
-		self.lista=list()
-		self.Tn=None
+	    self.lista=list()
+	    self.Tn=None
 
         # Setup the publishers and subscribers
         self.sub_april = rospy.Subscriber("~apriltags", AprilTagsWithInfos, self.tag_callback)
-		self.sub_wheels=rospy.Subscriber('/duckiebot/wheels_driver_node/car_cmd', Twist2DStamped, self.pos_callback)
+	    self.sub_wheels=rospy.Subscriber('/duckiebot/wheels_driver_node/car_cmd', Twist2DStamped, self.pos_callback)
         self.pub_tf = rospy.Publisher("/tf", TFMessage, queue_size=1, latch=True)
         self.pub_rviz = rospy.Publisher("/sign_highlights", Marker, queue_size=1, latch=True)
 
