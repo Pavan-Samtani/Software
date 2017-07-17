@@ -1,11 +1,65 @@
-# Software
+<h1>Guia De localizacion</h1>
 
-## English / Inglés
+<h2>Archivos</h2>
 
-In this repository we will collect all the software, middleware, drivers, ROS modules, and so on, that would allow to run our cars. 
+* <h4>Duckie_core.launch</h4>
 
-## Español / Spanish
+Este archivo tipo launch, activa los motores y ejecuta los nodos [joy_control](#joy_control),
+[duck_detector](#duck_detector) y [controller](#controller), ademas de `Apriltags.launch`
 
-En este repositorio recopilamos el software, _middleware_, _drivers_, módulos de ROS, entre otros, que permiten que los robots funcionen.
+* <h4>Apriltags.launch</h4>
 
+Activa la camara, y la deteccion de apriltags.
 
+* <h4>Joy_control</h4>
+
+Este nodo se encarga de entregar los datos del control.
+* <h4>Duck_detector</h4>
+
+Este nodo realiza la captacion de imagen, por parte de la camara, para ver si se encuentra un pato al frente, y entrega su 
+posicion.
+* <h4>Controller</h4>
+
+Este toma los datos de ambos nodos (`joy_control` y `duck_detector`), para que el duckiebot se pueda mover 
+sin atropellar a un pato.
+
+<h2>Procedimiento</h2>
+
+1.**Iniciar mediante ssh al duckiebot**
+
+2.**Ejecutar `cd duckietown`**
+
+3.**Usar el comando `./hotspot.sh on`**
+
+Deja al robot movible, con el uso de WI-FI.<br>
+*Indicacion*: Se quedará pegada la terminal al correr el codigo. Se requiere reiniciar y conectar mediante Wi-fi</br>
+
+4.**Correr `Byoubu`**
+
+*Indicacion*: Con `F2` se abren nuevas pestañas, y `F3` para cambiar.
+
+5.**Usar el comando `roscore`**
+
+6.**Correr el codigo `roslaunch ros_cap duckie_core.launch`**
+
+Se inician los nodos del ***duckie_core.launch***, explicados al [inicio.](#archivos)
+<br>Se prenden los motores, para su uso mediante el control, además de la camara para detectar apriltags. </br>
+
+### En el computador <br></br>
+
+7.**Usar el comando `cd duckietown`**
+
+Para ingresar a la carpeta, donde se encuentran los archivos.
+
+8.**Correr `Source environment.sh`**
+
+9.**Correr `source set_ros_master.sh duckiebot`**
+
+10.**Usar el codigo `roslaunch duckietown localization.launch veh:=duckiebot`**
+
+Este launch lanzará el mapa 3D en ***Rviz***, para su visualizacion.
+
+![Texto Alt](Image/Rviz.png)
+
+11.**Listo para usar**:sunglasses: :hatched_chick:
+   
