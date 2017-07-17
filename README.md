@@ -59,7 +59,6 @@ Para ingresar a la carpeta, donde se encuentran los archivos.
 
 Este launch lanzará el mapa 3D en ***Rviz***, para su visualizacion.
 
-![Texto Alt](Image/Rviz.png)
 
 11.**Listo para usar**:sunglasses: :hatched_chick:
    
